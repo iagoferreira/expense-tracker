@@ -5,7 +5,7 @@ function App() {
 
   return (
     <>
-      <div className="bg-amber-900">
+      <div className="bg-amber-900 text-foreground">
         <button onClick={() => setCount((count) => count + 1)}>
           up
         </button>
