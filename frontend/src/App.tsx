@@ -1,23 +1,33 @@
-import { useState } from 'react'
-import { Button } from '@/components/ui/button'
+import { useEffect, useState } from 'react'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [totalSpent, setTotalSpent] = useState(0)
+
+  useEffect(() => {
+    const fetchTotalSpent = async () => {
+      const response = await fetch('/api/expenses/total-spent')
+      const data = await response.json()
+      setTotalSpent(data.total)
+    }
+
+    fetchTotalSpent()
+  }, [])
 
   return (
-    <>
-      <div className="flex flex-col bg-background">
-        <Button onClick={() => setCount((count) => count + 1)}>
-          up
-        </Button>
-        <Button onClick={() => setCount((count) => count - 1)}>
-          down
-        </Button>
-        <p>
-          {count}
-        </p>
-      </div>
-    </>
+    <Card className="w-[350px] m-auto">
+      <CardHeader>
+        <CardTitle>Total Spent</CardTitle>
+        <CardDescription>The total amount you've spent</CardDescription>
+      </CardHeader>
+      <CardContent>{totalSpent}</CardContent>
+    </Card>
   )
 }
 

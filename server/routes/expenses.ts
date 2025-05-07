@@ -10,7 +10,7 @@ const expenseSchema = z.object({
 
 type Expense = z.infer<typeof expenseSchema>;
 
-const expensePostSchema = expenseSchema.omit({id: true});
+const expensePostSchema = expenseSchema.omit({ id: true });
 
 const fakeExpenses: Expense[] = [
   { id: 1, title: 'Groceries', amount: 50.25 },
@@ -24,7 +24,7 @@ const expensesRoute = new Hono()
   .get(
     '/',
     (c) => {
-      return c.json({ expenses: fakeExpenses});
+      return c.json({ expenses: fakeExpenses });
     }
   )
   .post(
@@ -35,9 +35,16 @@ const expensesRoute = new Hono()
     ),
     (c) => {
       const expense = c.req.valid('json');;
-      fakeExpenses.push({...expense, id: fakeExpenses.length + 1});
+      fakeExpenses.push({ ...expense, id: fakeExpenses.length + 1 });
       c.status(201);
       return c.json(expense);
+    }
+  )
+  .get(
+    '/total-spent',
+    (c) => {
+      const total = fakeExpenses.reduce((acc, expense) => acc + expense.amount, 0);
+      return c.json({ total });
     }
   )
   .get(
@@ -48,7 +55,7 @@ const expensesRoute = new Hono()
       if (!expense) {
         return c.notFound();
       }
-      return c.json({expense});
+      return c.json({ expense });
     }
   )
   .delete(
