@@ -8,7 +8,10 @@ const app = new Hono();
 
 app.use('*', logger());
 
-app.route('/api/expenses', expensesRoute);
+const apiRoutes = app.basePath('/api')
+  .route('/expenses', expensesRoute);
+
+export type ApiRoutes = typeof apiRoutes;
 
 app.use(
   '*',
