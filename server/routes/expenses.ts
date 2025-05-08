@@ -42,7 +42,8 @@ const expensesRoute = new Hono()
   )
   .get(
     '/total-spent',
-    (c) => {
+    async (c) => {
+      await new Promise((r) => setTimeout(r, 1000));
       const total = fakeExpenses.reduce((acc, expense) => acc + expense.amount, 0);
       return c.json({ total });
     }
