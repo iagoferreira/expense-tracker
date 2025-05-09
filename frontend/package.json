@@ -13,6 +13,8 @@
     "@radix-ui/react-slot": "^1.2.1",
     "@tailwindcss/vite": "^4.1.5",
     "@tanstack/react-query": "^5.75.5",
+    "@tanstack/react-router": "^1.120.3",
+    "@tanstack/router-vite-plugin": "^1.120.3",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.507.0",
