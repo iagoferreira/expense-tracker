@@ -15,6 +15,7 @@ export const Route = createFileRoute('/')({
 
 function Index() {
   async function getTotalSpent() {
+    await new Promise((r) => setTimeout(r, 1000));
     const response = await api.expenses['total-spent'].$get();
 
     if (!response.ok) throw new Error('Network response was not ok');
@@ -29,8 +30,6 @@ function Index() {
     queryFn: getTotalSpent
   });
 
-  if (isPending) return 'Loading...';
-
   if (error) return 'An error has occurred: ' + error.message;
 
   return (
@@ -39,7 +38,7 @@ function Index() {
         <CardTitle>Total Spent</CardTitle>
         <CardDescription>The total amount you've spent</CardDescription>
       </CardHeader>
-      <CardContent>{data.total}</CardContent>
+      <CardContent>{isPending ? 'Loading...' : data.total}</CardContent>
     </Card>
   )
 }

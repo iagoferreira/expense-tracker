@@ -9,15 +9,6 @@ export const Route = createRootRoute({
   component: RootComponent,
 })
 
-function RootComponent() {
-  return (
-    <React.Fragment>
-      <Navbar />
-      <Outlet />
-    </React.Fragment>
-  )
-}
-
 function Navbar() {
   return (
     <div className="p-2 flex gap-2">
@@ -31,5 +22,14 @@ function Navbar() {
         Create
       </Link>
     </div>
+  )
+}
+
+function RootComponent() {
+  return (
+    <React.Fragment>
+      <Navbar />
+      <Outlet />
+    </React.Fragment>
   )
 }
