@@ -87,7 +87,7 @@ function Expenses() {
       </TableHeader>
       <TableBody>
         {isPending ? (
-          Array(5).fill(0).map((_, i) => (
+          Array(6).fill(0).map((_, i) => (
             <TableRow key={i}>
               <TableCell className='w-24'>
                 <Skeleton className="h-4" />
