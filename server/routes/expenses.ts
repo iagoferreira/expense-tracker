@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
+import { getUser } from '../kinde';
 
 const expenseSchema = z.object({
   id: z.number().int().positive().min(1),
@@ -23,12 +24,14 @@ const fakeExpenses: Expense[] = [
 const expensesRoute = new Hono()
   .get(
     '/',
+    getUser,
     (c) => {
       return c.json({ expenses: fakeExpenses });
     }
   )
   .post(
     '/',
+    getUser,
     zValidator(
       'json',
       expensePostSchema
@@ -42,6 +45,7 @@ const expensesRoute = new Hono()
   )
   .get(
     '/total-spent',
+    getUser,
     (c) => {
       const total = fakeExpenses.reduce((acc, expense) => acc + expense.amount, 0);
       return c.json({ total });
@@ -49,6 +53,7 @@ const expensesRoute = new Hono()
   )
   .get(
     '/:id{[0-9]+}',
+    getUser,
     (c) => {
       const id = Number.parseInt(c.req.param('id'));
       const expense = fakeExpenses.find((e) => e.id === id);
@@ -60,6 +65,7 @@ const expensesRoute = new Hono()
   )
   .delete(
     '/:id{[0-9]+}',
+    getUser,
     (c) => {
       const id = Number.parseInt(c.req.param('id'));
       const index = fakeExpenses.findIndex((e) => e.id === id);

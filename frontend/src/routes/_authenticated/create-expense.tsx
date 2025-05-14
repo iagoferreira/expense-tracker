@@ -6,7 +6,7 @@ import { useForm } from '@tanstack/react-form'
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { api } from '@/lib/api'
 
-export const Route = createFileRoute('/create-expense')({
+export const Route = createFileRoute('/_authenticated/create-expense')({
   component: CreateExpense,
 })
 
@@ -40,7 +40,6 @@ function CreateExpense() {
 
   return (
     <div>
-      <h2>Create Expense</h2>
       <form className='max-w-xl m-auto'
         onSubmit={(e) => {
           e.preventDefault()
