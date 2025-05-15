@@ -5,6 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "bun --watch server/index.ts",
+    "generate": "bunx drizzle-kit generate",
     "migrate": "bunx drizzle-kit push"
   },
   "devDependencies": {

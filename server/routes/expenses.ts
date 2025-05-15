@@ -4,7 +4,7 @@ import { zValidator } from '@hono/zod-validator';
 import { getUser } from '../kinde';
 import { db } from '../db';
 import { expensesTable } from '../db/schema/expenses';
-import { eq } from 'drizzle-orm';
+import { and, desc, eq, sum } from 'drizzle-orm';
 
 const expenseSchema = z.object({
   id: z.number().int().positive().min(1),
@@ -36,6 +36,8 @@ const expensesRoute = new Hono()
         .where(
           eq(expensesTable.userId, user.id)
         )
+        .orderBy(desc(expensesTable.createdAt))
+        .limit(100);
 
       return c.json({ expenses: expenses });
     }
@@ -66,17 +68,37 @@ const expensesRoute = new Hono()
   .get(
     '/total-spent',
     getUser,
-    (c) => {
-      const total = fakeExpenses.reduce((acc, expense) => acc + +expense.amount, 0);
-      return c.json({ total });
+    async (c) => {
+      const user = c.var.user;
+      const result = await db
+        .select({ total: sum(expensesTable.amount) })
+        .from(expensesTable)
+        .where(
+          eq(expensesTable.userId, user.id)
+        )
+        .limit(1)
+        .then((res) => res[0]);
+
+      return c.json(result);
     }
   )
   .get(
     '/:id{[0-9]+}',
     getUser,
-    (c) => {
+    async (c) => {
       const id = Number.parseInt(c.req.param('id'));
-      const expense = fakeExpenses.find((e) => e.id === id);
+      const user = c.var.user;
+      const expense = await db
+        .select()
+        .from(expensesTable)
+        .where(
+          and(
+            eq(expensesTable.userId, user.id),
+            eq(expensesTable.id, id)
+          )
+        ).
+        then((res) => res[0]);
+
       if (!expense) {
         return c.notFound();
       }
@@ -86,14 +108,25 @@ const expensesRoute = new Hono()
   .delete(
     '/:id{[0-9]+}',
     getUser,
-    (c) => {
+    async (c) => {
       const id = Number.parseInt(c.req.param('id'));
-      const index = fakeExpenses.findIndex((e) => e.id === id);
-      if (index === -1) {
+      const user = c.var.user;
+      const expense = await db
+        .delete(expensesTable)
+        .where(
+          and(
+            eq(expensesTable.userId, user.id),
+            eq(expensesTable.id, id)
+          )
+        )
+        .returning()
+        .then((res) => res[0])
+
+      if (!expense) {
         return c.notFound();
       }
-      fakeExpenses.splice(index, 1);
-      return c.json({ message: 'Expense deleted' });
+
+      return c.json({ expense });
     }
   )
 
