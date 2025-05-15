@@ -4,7 +4,8 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "bun --watch server/index.ts"
+    "dev": "bun --watch server/index.ts",
+    "migrate": "bunx drizzle-kit push"
   },
   "devDependencies": {
     "@types/bun": "latest",
