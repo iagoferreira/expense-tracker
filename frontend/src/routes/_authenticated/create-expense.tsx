@@ -26,7 +26,7 @@ function CreateExpense() {
   const form = useForm({
     defaultValues: {
       title: '',
-      amount: 0,
+      amount: '0',
     },
     onSubmit: async ({ value }) => {
       await new Promise((resolve) => setTimeout(resolve, 3000))
@@ -90,14 +90,14 @@ function CreateExpense() {
               onChange: ({ value }) =>
                 !value
                   ? 'A amount is required'
-                  : value < 0
+                  : Number(value) < 0
                     ? 'Amount must be at least 0'
                     : undefined,
               onChangeAsyncDebounceMs: 500,
               onChangeAsync: async ({ value }) => {
                 await new Promise((resolve) => setTimeout(resolve, 1000))
                 return (
-                  value < 0 && 'Amount must be a positive number'
+                  Number(value) < 0 && 'Amount must be a positive number'
                 )
               },
             }}
@@ -111,7 +111,7 @@ function CreateExpense() {
                     name={field.name}
                     value={field.state.value}
                     onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(Number(e.target.value))}
+                    onChange={(e) => field.handleChange(e.target.value)}
                   />
                   <FieldInfo field={field} />
                 </>
