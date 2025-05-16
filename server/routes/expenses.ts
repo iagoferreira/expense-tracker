@@ -1,28 +1,10 @@
 import { Hono } from 'hono';
-import { z } from 'zod';
 import { zValidator } from '@hono/zod-validator';
 import { getUser } from '../kinde';
 import { db } from '../db';
-import { expensesTable } from '../db/schema/expenses';
+import { expensesTable, expenseInsertSchema } from '../db/schema/expenses';
 import { and, desc, eq, sum } from 'drizzle-orm';
-
-const expenseSchema = z.object({
-  id: z.number().int().positive().min(1),
-  title: z.string().min(3).max(100),
-  amount: z.string(),
-});
-
-type Expense = z.infer<typeof expenseSchema>;
-
-const expensePostSchema = expenseSchema.omit({ id: true });
-
-const fakeExpenses: Expense[] = [
-  { id: 1, title: 'Groceries', amount: '50.25' },
-  { id: 2, title: 'Electricity Bill', amount: '75.0' },
-  { id: 3, title: 'Internet Subscription', amount: '30.0' },
-  { id: 4, title: 'Gym Membership', amount: '40.0' },
-  { id: 5, title: 'Dining Out', amount: '60.5' }
-];
+import { expenseSchema } from '../../shared/types';
 
 const expensesRoute = new Hono()
   .get(
@@ -47,17 +29,20 @@ const expensesRoute = new Hono()
     getUser,
     zValidator(
       'json',
-      expensePostSchema
+      expenseSchema
     ),
     async (c) => {
       const user = c.var.user;
       const expense = c.req.valid('json');
+
+      const validatedExpense = expenseInsertSchema.parse({
+        ...expense,
+        userId: user.id
+      });
+
       const res = await db
         .insert(expensesTable)
-        .values({
-          ...expense,
-          userId: user.id
-        })
+        .values(validatedExpense)
         .returning()
 
       c.status(201);

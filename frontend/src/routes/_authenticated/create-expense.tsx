@@ -5,20 +5,29 @@ import { Button } from '@/components/ui/button'
 import { useForm } from '@tanstack/react-form'
 import type { AnyFieldApi } from '@tanstack/react-form'
 import { api } from '@/lib/api'
+import { expenseSchema } from '@shared/types'
 
 export const Route = createFileRoute('/_authenticated/create-expense')({
   component: CreateExpense,
 })
 
+type FieldError = string | { message: string };
+
 function FieldInfo({ field }: { field: AnyFieldApi }) {
   return (
     <>
       {field.state.meta.isTouched && !field.state.meta.isValid ? (
-        <em>{field.state.meta.errors.join(', ')}</em>
+        <em>
+          {field.state.meta.errors
+            .map((err: FieldError) =>
+              typeof err === "string" ? err : err?.message
+            )
+            .join(", ")}
+        </em>
       ) : null}
-      {field.state.meta.isValidating ? 'Validating...' : null}
+      {field.state.meta.isValidating ? "Validating..." : null}
     </>
-  )
+  );
 }
 
 function CreateExpense() {
@@ -51,14 +60,7 @@ function CreateExpense() {
           <form.Field
             name="title"
             validators={{
-              onChange: ({ value }) =>
-                !value
-                  ? 'A title is required'
-                  : value.length < 3
-                    ? 'Title must be at least 3 characters'
-                    : value.length > 100
-                      ? 'Title must be at most 100 characters'
-                      : undefined,
+              onChange: expenseSchema.shape.title,
               onChangeAsyncDebounceMs: 500,
               onChangeAsync: async ({ value }) => {
                 await new Promise((resolve) => setTimeout(resolve, 1000))
@@ -87,12 +89,7 @@ function CreateExpense() {
           <form.Field
             name="amount"
             validators={{
-              onChange: ({ value }) =>
-                !value
-                  ? 'A amount is required'
-                  : Number(value) < 0
-                    ? 'Amount must be at least 0'
-                    : undefined,
+              onChange: expenseSchema.shape.amount,
               onChangeAsyncDebounceMs: 500,
               onChangeAsync: async ({ value }) => {
                 await new Promise((resolve) => setTimeout(resolve, 1000))
