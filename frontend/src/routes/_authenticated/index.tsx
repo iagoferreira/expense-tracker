@@ -15,7 +15,6 @@ export const Route = createFileRoute('/_authenticated/')({
 
 function Index() {
   async function getTotalSpent() {
-    await new Promise((r) => setTimeout(r, 1000));
     const response = await api.expenses['total-spent'].$get();
 
     if (!response.ok) throw new Error('Network response was not ok');

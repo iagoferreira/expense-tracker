@@ -40,7 +40,6 @@ function CreateExpense() {
       date: new Date().toISOString(),
     },
     onSubmit: async ({ value }) => {
-      await new Promise((resolve) => setTimeout(resolve, 3000))
       const res = await api.expenses.$post({ json: value })
       if (!res.ok) {
         throw new Error('Failed to create expense')

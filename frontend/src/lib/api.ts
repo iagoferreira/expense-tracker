@@ -7,7 +7,6 @@ const client = hc<ApiRoutes>('/');
 export const api = client.api;
 
 async function getCurrentUser() {
-  await new Promise((r) => setTimeout(r, 1000));
   const response = await api.auth.me.$get();
 
   if (!response.ok) {
