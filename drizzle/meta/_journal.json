@@ -15,6 +15,13 @@
       "when": 1747307292553,
       "tag": "0001_amazing_quasimodo",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1747438750833,
+      "tag": "0002_fair_nebula",
+      "breakpoints": true
     }
   ]
 }

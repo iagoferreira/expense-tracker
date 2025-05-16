@@ -55,6 +55,10 @@ function Expenses() {
       accessorKey: 'amount',
       header: 'Amount',
     },
+    {
+      accessorKey: 'date',
+      header: 'Date',
+    }
   ];
 
   const table = useReactTable({
