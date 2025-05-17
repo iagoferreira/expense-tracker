@@ -44,6 +44,7 @@ const expensesRoute = new Hono()
         .insert(expensesTable)
         .values(validatedExpense)
         .returning()
+        .then((res) => res[0]);
 
       c.status(201);
 
