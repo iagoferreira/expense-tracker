@@ -1,10 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 import {
+  deleteExpense,
   getAllExpenses,
   getAllExpensesQueryOptions,
   loadingCreateExpenseQueryOptions
 } from '@/lib/api'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import {
   ColumnDef,
   flexRender,
@@ -20,18 +21,58 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
+import { Button } from '@/components/ui/button'
+import { Trash } from 'lucide-react'
+import { toast } from 'sonner'
 
 
 export const Route = createFileRoute('/_authenticated/expenses')({
   component: Expenses,
 })
 
+function DeleteButton({ id }: { id: number }) {
+  const queryClient = useQueryClient()
+  const mutation = useMutation({
+    mutationFn: deleteExpense,
+    onError: (e) => {
+      console.log(e);
+      toast("Error", {
+        description: `Failed to delete expense: ${id}`,
+      })
+    },
+    onSuccess: () => {
+      toast("Success", {
+        description: `Successfully deleted expense: ${id}`,
+      })
+      queryClient.setQueryData(
+        getAllExpensesQueryOptions.queryKey,
+        (existingExpenses) => ({
+          ...existingExpenses,
+          expenses: existingExpenses!.expenses.filter((e) => e.id !== id)
+        }))
+    },
+  })
+
+  return <Button
+    disabled={mutation.isPending}
+    variant="outline"
+    size="icon"
+    onClick={() => { mutation.mutate({ id }) }}
+  >
+    {mutation.isPending
+      ? <Skeleton className="h-9 w-9 rounded-lg py-1">
+        ...
+      </Skeleton>
+      : <Trash />
+    }
+  </Button >
+    ;
+}
+
 function Expenses() {
   const { isPending, error, data } = useQuery(getAllExpensesQueryOptions);
   const {
     data: loadingCreateExpense,
-    // isPending: isPendingCreateExpense,
-    // data: dataCreateExpense,
   } = useQuery(loadingCreateExpenseQueryOptions);
 
   type GetAllExpensesReturnType = Awaited<ReturnType<typeof getAllExpenses>>;
@@ -53,6 +94,11 @@ function Expenses() {
     {
       accessorKey: 'date',
       header: 'Date',
+    },
+    {
+      accessorKey: 'delete',
+      header: 'Delete',
+      cell: ({ row }) => <DeleteButton id={row.original.id} />
     }
   ];
 
@@ -99,12 +145,21 @@ function Expenses() {
             <TableCell>
               {loadingCreateExpense.expense.date.split('T')[0]}
             </TableCell>
+            <TableCell className='w-24'>
+              <Skeleton className="h-4" />
+            </TableCell>
           </TableRow>
         )}
         {isPending ? (
           Array(6).fill(0).map((_, i) => (
             <TableRow key={i}>
               <TableCell className='w-24'>
+                <Skeleton className="h-4" />
+              </TableCell>
+              <TableCell>
+                <Skeleton className="h-4" />
+              </TableCell>
+              <TableCell>
                 <Skeleton className="h-4" />
               </TableCell>
               <TableCell>
