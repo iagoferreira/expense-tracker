@@ -4,10 +4,11 @@ import { Label } from "@/components/ui/label"
 import { Button } from '@/components/ui/button'
 import { useForm } from '@tanstack/react-form'
 import type { AnyFieldApi } from '@tanstack/react-form'
-import { api, getAllExpensesQueryOptions } from '@/lib/api'
+import { createExpense, getAllExpensesQueryOptions, loadingCreateExpenseQueryOptions } from '@/lib/api'
 import { expenseSchema } from '@shared/types'
 import { Calendar } from "@/components/ui/calendar"
 import { useQueryClient } from "@tanstack/react-query";
+import { toast } from 'sonner'
 
 export const Route = createFileRoute('/_authenticated/create-expense')({
   component: CreateExpense,
@@ -43,22 +44,30 @@ function CreateExpense() {
     },
     onSubmit: async ({ value }) => {
       const existingExpenses = await queryClient.ensureQueryData(getAllExpensesQueryOptions);
-      const res = await api.expenses.$post({ json: value });
 
-      if (!res.ok) {
-        throw new Error('Failed to create expense')
-      }
-
-      const createdExpense = await res.json();
-
-      queryClient.setQueryData(getAllExpensesQueryOptions.queryKey, {
-        ...existingExpenses,
-        expenses: [
-          createdExpense,
-          ...existingExpenses.expenses,
-        ]
-      })
       navigate({ to: '/expenses' })
+
+      queryClient.setQueryData(loadingCreateExpenseQueryOptions.queryKey, { expense: value });
+
+      try {
+        const createdExpense = await createExpense({ value });
+
+        queryClient.setQueryData(getAllExpensesQueryOptions.queryKey, {
+          ...existingExpenses,
+          expenses: [createdExpense, ...existingExpenses.expenses]
+        })
+
+        toast("Expense created", {
+          description: `Successfully created expense with id ${createdExpense.id}`,
+        })
+      } catch (e) {
+        console.error(e);
+        toast("Error", {
+          description: "Failed to create expense",
+        })
+      } finally {
+        queryClient.setQueryData(loadingCreateExpenseQueryOptions.queryKey, {});
+      }
     },
   })
 

@@ -1,5 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { getAllExpenses, getAllExpensesQueryOptions } from '@/lib/api'
+import {
+  getAllExpenses,
+  getAllExpensesQueryOptions,
+  loadingCreateExpenseQueryOptions
+} from '@/lib/api'
 import { useQuery } from '@tanstack/react-query'
 import {
   ColumnDef,
@@ -24,6 +28,11 @@ export const Route = createFileRoute('/_authenticated/expenses')({
 
 function Expenses() {
   const { isPending, error, data } = useQuery(getAllExpensesQueryOptions);
+  const {
+    data: loadingCreateExpense,
+    // isPending: isPendingCreateExpense,
+    // data: dataCreateExpense,
+  } = useQuery(loadingCreateExpenseQueryOptions);
 
   type GetAllExpensesReturnType = Awaited<ReturnType<typeof getAllExpenses>>;
   type Expense = GetAllExpensesReturnType['expenses'][number];
@@ -76,6 +85,22 @@ function Expenses() {
         ))}
       </TableHeader>
       <TableBody>
+        {loadingCreateExpense?.expense && (
+          <TableRow>
+            <TableCell className='w-24'>
+              <Skeleton className="h-4" />
+            </TableCell>
+            <TableCell>
+              {loadingCreateExpense.expense.title}
+            </TableCell>
+            <TableCell>
+              {loadingCreateExpense.expense.amount}
+            </TableCell>
+            <TableCell>
+              {loadingCreateExpense.expense.date.split('T')[0]}
+            </TableCell>
+          </TableRow>
+        )}
         {isPending ? (
           Array(6).fill(0).map((_, i) => (
             <TableRow key={i}>

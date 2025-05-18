@@ -1,6 +1,7 @@
 import { hc } from 'hono/client';
 import { type ApiRoutes } from "@server/app";
 import { queryOptions } from '@tanstack/react-query';
+import { Expense } from '@shared/types';
 
 const client = hc<ApiRoutes>('/');
 
@@ -39,3 +40,25 @@ export const getAllExpensesQueryOptions = queryOptions({
   queryFn: getAllExpenses,
   staleTime: 1000 * 60 * 5,
 });
+
+export async function createExpense({ value }: { value: Expense }) {
+  await new Promise((r) => setTimeout(r, 3000));
+
+  const res = await api.expenses.$post({ json: value });
+
+  if (!res.ok) {
+    throw new Error('Failed to create expense')
+  }
+
+  const createdExpense = await res.json();
+
+  return createdExpense;
+}
+
+export const loadingCreateExpenseQueryOptions = queryOptions<{
+  expense?: | Expense
+}>({
+  queryKey: ['loading-create-expense'],
+  queryFn: () => ({}),
+  staleTime: Infinity
+})
