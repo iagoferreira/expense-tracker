@@ -3,7 +3,7 @@ import { type ApiRoutes } from "@server/app";
 import { queryOptions } from '@tanstack/react-query';
 import { Expense } from '@shared/types';
 
-const client = hc<ApiRoutes>('/');
+const client = hc('/') as ReturnType<typeof hc<ApiRoutes>>;
 
 export const api = client.api;
 

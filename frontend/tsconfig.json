@@ -15,10 +15,10 @@
         "./src/*"
       ],
       "@server/*": [
-        "../server/*"
+        "../backend/src/*"
       ],
       "@shared/*": [
-        "../shared/*"
+        "../backend/shared/*"
       ]
     }
   }

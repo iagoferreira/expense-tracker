@@ -1,4 +1,4 @@
-import { expenseInsertSchema } from '../server/db/schema/expenses';
+import { expenseInsertSchema } from '../src/db/schema/expenses';
 import { z } from 'zod';
 
 export const expenseSchema = expenseInsertSchema.omit({
